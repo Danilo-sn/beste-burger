@@ -30,7 +30,7 @@ class UserController {
 			where: { email },
 		})
 		if (emailExists) {
-			return res.status(400).json({ Erro: 'Email ja existe' })
+			return res.status(409).json({ Erro: 'Email ja existe' })
 		}
 		const user = {
 			id: v4(),

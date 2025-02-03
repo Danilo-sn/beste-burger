@@ -1,4 +1,5 @@
 import * as Yup from 'yup'
+import { Op } from 'sequelize'
 import Product from '../models/Product'
 import Category from '../models/Category'
 import User from '../models/User'
@@ -97,25 +98,26 @@ class ProductController {
 
 		const { name, price, category_id, offer } = req.body
 
-		const nameExists = await Product.findOne({
-			where: { name },
-		})
-		if (nameExists) {
-			return res
-				.status(400)
-				.json({ Erro: 'Já existe um Produto com esse nome cadastrado' })
+		if (name) {
+			const nameExists = await Product.findOne({
+				where: { name, id: { [Op.ne]: id } },
+			})
+
+			if (nameExists) {
+				return res
+					.status(400)
+					.json({ Erro: 'Já existe um Produto com esse nome cadastrado' })
+			}
 		}
 
-		await Product.update(
-			{
-				name,
-				price,
-				category_id,
-				path,
-				offer,
-			},
-			{ where: { id } },
-		)
+		await product.update({
+			name,
+			price,
+			category_id,
+			path: path || product.path,
+			offer,
+		})
+
 		return res.status(200).json({ message: 'Produto atualizado' })
 	}
 }
